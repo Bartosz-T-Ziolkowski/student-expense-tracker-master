@@ -120,4 +120,136 @@ export default function ExpenseScreen() {
     categoryTotals[e.category] =
       (categoryTotals[e.category] || 0) + e.amount;
   });
+  
+ return (
+    <SafeAreaView style={styles.container}>
+      <Text style={styles.heading}>Expense Tracker</Text>
+
+      <View style={styles.row}>
+        <Button title="All" onPress={() => setFilter('ALL')} />
+        <Button title="Week" onPress={() => setFilter('WEEK')} />
+        <Button title="Month" onPress={() => setFilter('MONTH')} />
+      </View>
+
+      <Text style={styles.total}>Total: ${total.toFixed(2)}</Text>
+
+      <Text style={styles.subheading}>By Category:</Text>
+      {Object.entries(categoryTotals).map(([cat, val]) => (
+        <Text key={cat} style={styles.categoryText}>
+          {cat}: ${val.toFixed(2)}
+        </Text>
+      ))}
+
+      <View style={styles.form}>
+        <TextInput
+          placeholder="Amount"
+          value={amount}
+          onChangeText={setAmount}
+          keyboardType="numeric"
+          style={styles.input}
+        />
+        <TextInput
+          placeholder="Category"
+          value={category}
+          onChangeText={setCategory}
+          style={styles.input}
+        />
+        <TextInput
+          placeholder="Note"
+          value={note}
+          onChangeText={setNote}
+          style={styles.input}
+        />
+        <TextInput
+          placeholder="Date (YYYY-MM-DD)"
+          value={date}
+          onChangeText={setDate}
+          style={styles.input}
+        />
+
+        <Button 
+          title={editId === null ? "Add Expense" : "Save Changes"}
+          onPress={saveExpense}
+        />
+      </View>
+      
+      <FlatList
+        data={filtered}
+        keyExtractor={(item) => item.id.toString()}
+        renderItem={({ item }) => (
+          <View style={styles.expenseRow}>
+            <View>
+              <Text>${item.amount.toFixed(2)}</Text>
+              <Text>{item.category}</Text>
+              <Text>{item.note}</Text>
+              <Text>{item.date}</Text>
+            </View>
+
+            <View>
+              <TouchableOpacity onPress={() => startEditing(item)}>
+                <Text style={styles.editText}>Edit</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => deleteExpense(item.id)}>
+                <Text style={styles.deleteText}>Delete</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        )}
+      />
+    </SafeAreaView>
+  );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 16,
+  },
+  heading: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 16,
+  },
+  subheading: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginTop: 16,
+  },
+  total: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginVertical: 8,
+  },
+  categoryText: {
+    fontSize: 16,
+  },
+  form: {
+    marginVertical: 16,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    padding: 8,
+    marginVertical: 4,
+    borderRadius: 4,
+  },
+  expenseRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingVertical: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+  },
+  editText: {
+    color: 'blue',
+    marginBottom: 4,
+  },
+  deleteText: {
+    color: 'red',
+  },
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginBottom: 16,
+  },
+});
